@@ -12,6 +12,7 @@ import (
 type Imovel struct {
 	Url      string   `json:"url"`
 	Title    string   `json:"title"`
+	Type     string   `json:"type"`
 	Subtitle string   `json:"subtitle"`
 	Info     string   `json:"Info"`
 	Price    string   `json:"price"`
@@ -40,6 +41,11 @@ func main() {
 			})
 
 		}
+		fmt.Println(section.Attr("title"))
+		section.ForEach(".tipo-prop", func(_ int, section_ *colly.HTMLElement) {
+			imovel.Type = section_.ChildText("strong")
+
+		})
 		section.ForEach(".card-imo-radius", func(_ int, section_ *colly.HTMLElement) {
 			if section_.ChildText("p") != "" && section_.ChildText(".descricao-imovel") != "" {
 				imovel.Info = section_.ChildText("p")
