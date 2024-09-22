@@ -4,29 +4,32 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gocolly/colly"
 )
 
-// type Images map[string]string
 type Imovel struct {
 	Url      string   `json:"url"`
 	Title    string   `json:"title"`
 	Subtitle string   `json:"subtitle"`
+	Info     string   `json:"Info"`
 	Price    string   `json:"price"`
-	Imgs     []string `json:"Imgs"`
+	Imgs     []string `json:"imgs"`
 }
 
 func main() {
-	collector := colly.NewCollector()
-	var imoveis []Imovel
 
+	collector := colly.NewCollector()
 	collector.OnError(func(r *colly.Response, e error) {
 		fmt.Println("Blimey, an error occurred!:", e)
 	})
 
-	collector.OnHTML(".container", func(section *colly.HTMLElement) {
-		imovel := Imovel{}
+	imovel := Imovel{}
+	url := os.Args[1]
+	imovel.Url = url
+
+	collector.OnHTML("section", func(section *colly.HTMLElement) {
 		if section.ChildText(".row") != "" && section.ChildText(".titulo-imovel") != "" {
 			imovel.Title = section.ChildText(".titulo-imovel")
 			imovel.Subtitle = section.ChildText(".subtitulo-imovel")
@@ -35,24 +38,25 @@ func main() {
 					imovel.Price = elements.ChildText("strong")
 				}
 			})
-			jsonData, err := json.MarshalIndent(imovel, "", "  ")
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println(string(jsonData))
-			imoveis = append(imoveis, imovel)
+
 		}
+		section.ForEach(".card-imo-radius", func(_ int, section_ *colly.HTMLElement) {
+			if section_.ChildText("p") != "" && section_.ChildText(".descricao-imovel") != "" {
+				imovel.Info = section_.ChildText("p")
+
+			}
+		})
+		section.ForEach("#slide_fotos", func(_ int, section *colly.HTMLElement) {
+			section.ForEach(".img-slider", func(i int, elements *colly.HTMLElement) {
+				imovel.Imgs = append(imovel.Imgs, elements.Attr("src"))
+			})
+		})
+		jsonData, err := json.MarshalIndent(imovel, "", "  ")
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(jsonData))
 	})
-	//TODO - GET IMAGES IMVOEL
 
-	collector.Visit("https://www.ivannegocios.com.br/alugar/Uberlandia/Comercial/Loja/Centro/66345")
-
-	// Convertendo os dados para JSON formatado
-	// jsonData, err := json.MarshalIndent(imoveis, "", "  ")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// // Imprimindo os dados formatados
-	// fmt.Println(string(jsonData))
+	collector.Visit(imovel.Url)
 }
