@@ -2,6 +2,7 @@ package main
 
 import "github.com/gin-gonic/gin"
 
+// Recipe location
 func main() {
 	g := gin.Default()
 	g.GET("/", func(ctx *gin.Context) {
