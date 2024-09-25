@@ -1,4 +1,5 @@
-module scrapperhomes
+module github.com/raphaelbertoldo/scraping-rentals-br
+
 
 go 1.23.1
 
