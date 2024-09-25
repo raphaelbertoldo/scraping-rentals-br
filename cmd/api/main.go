@@ -12,7 +12,8 @@ func main() {
 	g := gin.Default()
 
 	g.GET("/", func(c *gin.Context) {
-		neighborhood := c.Query("q")
+		neighborhood := c.Query("neighborhood")
+
 		if neighborhood == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "neighborhood query is required"})
 			return

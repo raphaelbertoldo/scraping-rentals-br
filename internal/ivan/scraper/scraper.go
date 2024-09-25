@@ -23,7 +23,7 @@ type Imovel struct {
 }
 
 func (s *Service) Scraper(urls []string) []Imovel {
-	var imoveis []Imovel // Slice para armazenar os imóveis coletados
+	var imoveis []Imovel
 
 	for _, url := range urls {
 		fmt.Println("Processando URL:", url)
@@ -35,7 +35,7 @@ func (s *Service) Scraper(urls []string) []Imovel {
 		})
 
 		imovel := Imovel{
-			Url: url, // Atribui a URL atual
+			Url: url,
 		}
 
 		collector.OnHTML("section", func(section *colly.HTMLElement) {
