@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/chromedp/chromedp"
+	"github.com/raphaelbertoldo/scraping-rentals-br/internal/ivan/scraper"
 )
 
 func NewService() *Service {
@@ -15,7 +16,19 @@ func NewService() *Service {
 
 type Service struct{}
 
-func (s *Service) Search(query string) ([]string, error) {
+type Imovel struct {
+	Url      string   `json:"url"`
+	Title    string   `json:"title"`
+	Type     string   `json:"type"`
+	Subtitle string   `json:"subtitle"`
+	Info     string   `json:"info"`
+	Price    string   `json:"price"`
+	Imgs     []string `json:"imgs"`
+}
+
+func (s *Service) Search(query string) ([]Imovel, error) {
+	scraperService := scraper.NewService()
+
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.Flag("enable-automation", false),
 		chromedp.Flag("headless", false),
@@ -70,5 +83,21 @@ func (s *Service) Search(query string) ([]string, error) {
 	} else {
 		fmt.Printf("Total de hrefs únicos encontrados: %d\n", len(hrefs))
 	}
-	return hrefs, nil
+
+	scrapedImoveis := scraperService.Scraper(hrefs)
+
+	var imoveis []Imovel
+	for _, scrapedImovel := range scrapedImoveis {
+		imoveis = append(imoveis, Imovel{
+			Url:      scrapedImovel.Url,
+			Title:    scrapedImovel.Title,
+			Type:     scrapedImovel.Type,
+			Subtitle: scrapedImovel.Subtitle,
+			Info:     scrapedImovel.Info,
+			Price:    scrapedImovel.Price,
+			Imgs:     scrapedImovel.Imgs,
+		})
+	}
+
+	return imoveis, nil
 }

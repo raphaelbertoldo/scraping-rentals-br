@@ -12,21 +12,20 @@ func main() {
 	g := gin.Default()
 
 	g.GET("/", func(c *gin.Context) {
-		query := c.Query("q")
-		if query == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Parâmetro de busca 'q' é obrigatório"})
+		neighborhood := c.Query("q")
+		if neighborhood == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "neighborhood query is required"})
 			return
 		}
 
-		results, err := searchService.Search(query)
+		results, err := searchService.Search(neighborhood)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao realizar a busca"})
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"results": results,
-			"message": "Hello World",
+			"data": results,
 		})
 	})
 

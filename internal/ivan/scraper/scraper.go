@@ -1,68 +1,75 @@
-package main
+package scraper
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
-	"os"
 
 	"github.com/gocolly/colly"
 )
+
+func NewService() *Service {
+	return &Service{}
+}
+
+type Service struct{}
 
 type Imovel struct {
 	Url      string   `json:"url"`
 	Title    string   `json:"title"`
 	Type     string   `json:"type"`
 	Subtitle string   `json:"subtitle"`
-	Info     string   `json:"Info"`
+	Info     string   `json:"info"`
 	Price    string   `json:"price"`
 	Imgs     []string `json:"imgs"`
 }
 
-func main() {
+func (s *Service) Scraper(urls []string) []Imovel {
+	var imoveis []Imovel // Slice para armazenar os imóveis coletados
 
-	collector := colly.NewCollector()
-	collector.OnError(func(r *colly.Response, e error) {
-		fmt.Println("Blimey, an error occurred!:", e)
-	})
+	for _, url := range urls {
+		fmt.Println("Processando URL:", url)
 
-	imovel := Imovel{}
-	url := os.Args[1]
-	imovel.Url = url
+		collector := colly.NewCollector()
 
-	collector.OnHTML("section", func(section *colly.HTMLElement) {
-		if section.ChildText(".row") != "" && section.ChildText(".titulo-imovel") != "" {
-			imovel.Title = section.ChildText(".titulo-imovel")
-			imovel.Subtitle = section.ChildText(".subtitulo-imovel")
-			section.ForEach(".text-end", func(i int, elements *colly.HTMLElement) {
-				if elements.ChildText("strong") != "" {
-					imovel.Price = elements.ChildText("strong")
+		collector.OnError(func(r *colly.Response, e error) {
+			fmt.Println("Ocorreu um erro:", e)
+		})
+
+		imovel := Imovel{
+			Url: url, // Atribui a URL atual
+		}
+
+		collector.OnHTML("section", func(section *colly.HTMLElement) {
+			if section.ChildText(".row") != "" && section.ChildText(".titulo-imovel") != "" {
+				imovel.Title = section.ChildText(".titulo-imovel")
+				imovel.Subtitle = section.ChildText(".subtitulo-imovel")
+				section.ForEach(".text-end", func(i int, elements *colly.HTMLElement) {
+					if elements.ChildText("strong") != "" {
+						imovel.Price = elements.ChildText("strong")
+					}
+				})
+			}
+
+			section.ForEach(".tipo-prop", func(_ int, section_ *colly.HTMLElement) {
+				imovel.Type = section_.ChildText("strong")
+			})
+
+			section.ForEach(".card-imo-radius", func(_ int, section_ *colly.HTMLElement) {
+				if section_.ChildText("p") != "" && section_.ChildText(".descricao-imovel") != "" {
+					imovel.Info = section_.ChildText("p")
 				}
 			})
 
-		}
-		fmt.Println(section.Attr("title"))
-		section.ForEach(".tipo-prop", func(_ int, section_ *colly.HTMLElement) {
-			imovel.Type = section_.ChildText("strong")
-
-		})
-		section.ForEach(".card-imo-radius", func(_ int, section_ *colly.HTMLElement) {
-			if section_.ChildText("p") != "" && section_.ChildText(".descricao-imovel") != "" {
-				imovel.Info = section_.ChildText("p")
-
-			}
-		})
-		section.ForEach("#slide_fotos", func(_ int, section *colly.HTMLElement) {
-			section.ForEach(".img-slider", func(i int, elements *colly.HTMLElement) {
-				imovel.Imgs = append(imovel.Imgs, elements.Attr("src"))
+			section.ForEach("#slide_fotos", func(_ int, section *colly.HTMLElement) {
+				section.ForEach(".img-slider", func(i int, elements *colly.HTMLElement) {
+					imovel.Imgs = append(imovel.Imgs, elements.Attr("src"))
+				})
 			})
 		})
-		jsonData, err := json.MarshalIndent(imovel, "", "  ")
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(string(jsonData))
-	})
 
-	collector.Visit(imovel.Url)
+		collector.Visit(imovel.Url)
+
+		imoveis = append(imoveis, imovel)
+	}
+
+	return imoveis
 }
