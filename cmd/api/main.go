@@ -2,7 +2,7 @@ package main
 
 import "github.com/gin-gonic/gin"
 
-// Recipe location
+// TODO - Recipe location data and call search
 func main() {
 	g := gin.Default()
 	g.GET("/", func(ctx *gin.Context) {
@@ -10,5 +10,6 @@ func main() {
 			"message": "Hello World",
 		})
 	})
+
 	g.Run(":3000")
 }
