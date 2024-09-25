@@ -2,6 +2,7 @@ package scraper
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gocolly/colly"
 )
@@ -42,10 +43,12 @@ func (s *Service) Scraper(urls []string) []Imovel {
 			if section.ChildText(".row") != "" && section.ChildText(".titulo-imovel") != "" {
 				imovel.Title = section.ChildText(".titulo-imovel")
 				imovel.Subtitle = section.ChildText(".subtitulo-imovel")
-				section.ForEach(".text-end", func(i int, elements *colly.HTMLElement) {
-					if elements.ChildText("strong") != "" {
-						imovel.Price = elements.ChildText("strong")
-					}
+				section.ForEach(".valores_imovel", func(_ int, elements *colly.HTMLElement) {
+					elements.ForEach(".row", func(_ int, elements_ *colly.HTMLElement) {
+						if strings.Contains(elements_.Text, "Total / Mês") {
+							imovel.Price = elements_.ChildText("strong")
+						}
+					})
 				})
 			}
 
