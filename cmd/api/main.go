@@ -1,12 +1,31 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
 
-// TODO - Recipe location data and call search
+	"github.com/gin-gonic/gin"
+	"github.com/raphaelbertoldo/scraping-rentals-br/internal/ivan/search"
+)
+
 func main() {
+	searchService := search.NewService()
 	g := gin.Default()
-	g.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
+
+	g.GET("/", func(c *gin.Context) {
+		query := c.Query("q")
+		if query == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Parâmetro de busca 'q' é obrigatório"})
+			return
+		}
+
+		results, err := searchService.Search(query)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao realizar a busca"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"results": results,
 			"message": "Hello World",
 		})
 	})

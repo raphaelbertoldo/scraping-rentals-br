@@ -1,4 +1,4 @@
-package main
+package search
 
 import (
 	"context"
@@ -9,8 +9,13 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-func main() {
-	// Configuração do contexto e opções (mantido do código anterior)
+func NewService() *Service {
+	return &Service{}
+}
+
+type Service struct{}
+
+func (s *Service) Search(query string) ([]string, error) {
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.Flag("enable-automation", false),
 		chromedp.Flag("headless", false),
@@ -65,4 +70,5 @@ func main() {
 	} else {
 		fmt.Printf("Total de hrefs únicos encontrados: %d\n", len(hrefs))
 	}
+	return hrefs, nil
 }
