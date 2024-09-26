@@ -13,13 +13,15 @@ func main() {
 
 	g.GET("/", func(c *gin.Context) {
 		neighborhood := c.Query("neighborhood")
+		min := c.Query("min")
+		max := c.Query("max")
 
 		if neighborhood == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "neighborhood query is required"})
 			return
 		}
 
-		results, err := searchService.Search(neighborhood)
+		results, err := searchService.Search(neighborhood, min, max)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao realizar a busca"})
 			return

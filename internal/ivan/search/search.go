@@ -158,7 +158,7 @@ var neighborhoodList = map[string]string{
 }
 
 // todo pass query
-func (s *Service) Search(neighborhood string) ([]Imovel, error) {
+func (s *Service) Search(neighborhood string, min string, max string) ([]Imovel, error) {
 	scraperService := scraper.NewService()
 	neighborhoodId := neighborhoodList[neighborhood]
 	fmt.Println("🚀 ~ file: search.go ~ line 167 ~ func ~ nh : ", neighborhoodId)
@@ -187,6 +187,10 @@ func (s *Service) Search(neighborhood string) ([]Imovel, error) {
 		chromedp.SetValue("#id_cidade", "2", chromedp.ByID),
 		chromedp.Sleep(2*time.Second),
 		chromedp.SetValue("#id_bairro", neighborhoodId, chromedp.ByID),
+		chromedp.Sleep(2*time.Second),
+		chromedp.SetValue("#vmi", min, chromedp.ByID),
+		chromedp.Sleep(2*time.Second),
+		chromedp.SetValue("#vma", max, chromedp.ByID),
 		chromedp.Sleep(2*time.Second),
 
 		chromedp.Click("button.btn.btn-primary.cantos-arredondados.loading[type='submit']", chromedp.ByQuery),
