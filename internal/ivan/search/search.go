@@ -26,9 +26,6 @@ type Imovel struct {
 	Imgs     []string `json:"imgs"`
 }
 
-type ngss struct {
-}
-
 var neighborhoodList = map[string]string{
 	"Aclimação":                   "146",
 	"Altamira":                    "154",
@@ -161,7 +158,7 @@ var neighborhoodList = map[string]string{
 func (s *Service) Search(neighborhood string, min string, max string) ([]Imovel, error) {
 	scraperService := scraper.NewService()
 	neighborhoodId := neighborhoodList[neighborhood]
-	fmt.Println("🚀 ~ file: search.go ~ line 167 ~ func ~ nh : ", neighborhoodId)
+
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.Flag("enable-automation", false),
 		chromedp.Flag("headless", false),
