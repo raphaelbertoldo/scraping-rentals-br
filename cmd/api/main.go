@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/raphaelbertoldo/scraping-rentals-br/internal/ivan/search"
+	"github.com/raphaelbertoldo/scraping-rentals-br/internal/ivan/IvanService"
 )
 
 func main() {
-	searchService := search.NewService()
+	searchService := IvanService.NewService()
 	g := gin.Default()
 
 	g.GET("/", func(c *gin.Context) {
