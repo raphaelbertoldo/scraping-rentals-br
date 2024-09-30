@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/raphaelbertoldo/scraping-rentals-br/internal/ivan/ivanService"
+	"github.com/raphaelbertoldo/scraping-rentals-br/internal/ivan/search/ivanService"
 )
 
 func main() {
