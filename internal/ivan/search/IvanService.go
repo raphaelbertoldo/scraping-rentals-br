@@ -1,4 +1,4 @@
-package IvanService
+package ivanService
 
 import (
 	"context"
