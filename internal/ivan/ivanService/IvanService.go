@@ -8,6 +8,7 @@ import (
 
 	"github.com/chromedp/chromedp"
 	"github.com/raphaelbertoldo/scraping-rentals-br/internal/ivan/scraper"
+	"github.com/raphaelbertoldo/scraping-rentals-br/internal/models"
 )
 
 func NewService() *Service {
@@ -15,16 +16,6 @@ func NewService() *Service {
 }
 
 type Service struct{}
-
-type Imovel struct {
-	Url      string   `json:"url"`
-	Title    string   `json:"title"`
-	Type     string   `json:"type"`
-	Subtitle string   `json:"subtitle"`
-	Info     string   `json:"info"`
-	Price    string   `json:"price"`
-	Imgs     []string `json:"imgs"`
-}
 
 var neighborhoodList = map[string]string{
 	"Aclimação":                   "146",
@@ -154,7 +145,7 @@ var neighborhoodList = map[string]string{
 	"Zona Rural":                              "1350",
 }
 
-func (s *Service) Search(neighborhood string, min string, max string) ([]Imovel, error) {
+func (s *Service) Search(neighborhood string, min string, max string) ([]models.Imovel, error) {
 	scraperService := scraper.NewService()
 	neighborhoodId := neighborhoodList[neighborhood]
 
@@ -220,9 +211,9 @@ func (s *Service) Search(neighborhood string, min string, max string) ([]Imovel,
 
 	scrapedImoveis := scraperService.Scraper(hrefs)
 
-	var imoveis []Imovel
+	var imoveis []models.Imovel
 	for _, scrapedImovel := range scrapedImoveis {
-		imoveis = append(imoveis, Imovel{
+		imoveis = append(imoveis, models.Imovel{
 			Url:      scrapedImovel.Url,
 			Title:    scrapedImovel.Title,
 			Type:     scrapedImovel.Type,

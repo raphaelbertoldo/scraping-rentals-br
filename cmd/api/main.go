@@ -5,10 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/raphaelbertoldo/scraping-rentals-br/internal/ivan/ivanService"
+	"github.com/raphaelbertoldo/scraping-rentals-br/internal/viva/vivaService"
 )
 
 func main() {
 	searchService := ivanService.NewService()
+	vivaService := vivaService.NewService()
 	g := gin.Default()
 
 	g.GET("/", func(c *gin.Context) {
@@ -26,9 +28,15 @@ func main() {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao realizar a busca"})
 			return
 		}
+		results1, err := vivaService.Search(neighborhood, min, max)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao realizar a busca"})
+			return
+		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"data": results,
+			"ivan": results,
+			"viva": results1,
 		})
 	})
 

@@ -1,10 +1,4 @@
-package search
-
-func NewService() *Service {
-	return &Service{}
-}
-
-type Service struct{}
+package models
 
 type Imovel struct {
 	Url      string   `json:"url"`
@@ -15,3 +9,5 @@ type Imovel struct {
 	Price    string   `json:"price"`
 	Imgs     []string `json:"imgs"`
 }
+
+type Service struct{}
