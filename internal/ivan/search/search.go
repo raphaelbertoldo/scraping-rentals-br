@@ -1,4 +1,4 @@
-package search
+package IvanService
 
 import (
 	"context"
@@ -154,7 +154,6 @@ var neighborhoodList = map[string]string{
 	"Zona Rural":                              "1350",
 }
 
-// todo pass query
 func (s *Service) Search(neighborhood string, min string, max string) ([]Imovel, error) {
 	scraperService := scraper.NewService()
 	neighborhoodId := neighborhoodList[neighborhood]
@@ -189,12 +188,9 @@ func (s *Service) Search(neighborhood string, min string, max string) ([]Imovel,
 		chromedp.Sleep(2*time.Second),
 		chromedp.SendKeys("#vma", max, chromedp.ByID),
 		chromedp.Sleep(2*time.Second),
-
 		chromedp.Click("button.btn.btn-primary.cantos-arredondados.loading[type='submit']", chromedp.ByQuery),
-
 		chromedp.Sleep(5*time.Second),
 		chromedp.WaitVisible(".muda_card1", chromedp.ByQuery),
-
 		chromedp.Evaluate(`
 			(() => {
 				const uniqueHrefs = new Set();
