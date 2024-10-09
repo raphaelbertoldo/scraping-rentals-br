@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/chromedp/chromedp"
-	"github.com/raphaelbertoldo/scraping-rentals-br/internal/models"
-	"github.com/raphaelbertoldo/scraping-rentals-br/internal/viva/scraper"
+	"github.com/raphaelbertoldo/scraping-rentals-br/cmd/internal/models"
+	"github.com/raphaelbertoldo/scraping-rentals-br/cmd/internal/viva/scraper"
 )
 
 func NewService() *Service {

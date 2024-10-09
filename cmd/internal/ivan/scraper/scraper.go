@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly"
-	"github.com/raphaelbertoldo/scraping-rentals-br/internal/models"
+	"github.com/raphaelbertoldo/scraping-rentals-br/cmd/internal/models"
 )
 
 func NewService() *Service {

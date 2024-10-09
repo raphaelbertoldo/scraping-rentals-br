@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/chromedp/chromedp"
-	"github.com/raphaelbertoldo/scraping-rentals-br/internal/models"
+	"github.com/raphaelbertoldo/scraping-rentals-br/cmd/internal/models"
 )
 
 type Service struct{}
