@@ -1,12 +1,11 @@
-package main
+package api
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/raphaelbertoldo/scraping-rentals-br/cmd/internal/ivan/ivanService"
-	"github.com/raphaelbertoldo/scraping-rentals-br/cmd/internal/viva/vivaService"
+	"github.com/raphaelbertoldo/scraping-rentals-br/api/internal/ivan/ivanService"
+	"github.com/raphaelbertoldo/scraping-rentals-br/api/internal/viva/vivaService"
 )
 
 type Server struct {
@@ -17,7 +16,7 @@ type Server struct {
 
 func NewServer() *Server {
 	s := &Server{
-		router:        gin.Default(),
+		router:        gin.New(),
 		searchService: ivanService.NewService(),
 		vivaService:   vivaService.NewService(),
 	}
@@ -29,12 +28,7 @@ func (s *Server) setupRoutes() {
 	s.router.GET("/", s.handleSearch)
 	s.router.GET("/health", s.checkHealth)
 }
-func (s *Server) checkHealth(c *gin.Context) {
-	response := gin.H{}
-	response["health"] = "okkkkk cu de egua"
-	c.JSON(http.StatusOK, response)
 
-}
 func (s *Server) handleSearch(c *gin.Context) {
 	neighborhood := c.Query("neighborhood")
 	min := c.Query("min")
@@ -64,18 +58,15 @@ func (s *Server) handleSearch(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (s *Server) Run(addr string) error {
-	return s.router.Run(addr)
+func (s *Server) checkHealth(c *gin.Context) {
+	response := gin.H{}
+	response["health"] = "okkkkk cu de egua"
+	c.JSON(http.StatusOK, response)
 }
 
-func main() {
-	server := NewServer()
-	if err := server.Run(":8080"); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	}
-}
-
+// Handler é a função que o Vercel vai chamar
 func Handler(w http.ResponseWriter, r *http.Request) {
+	gin.SetMode(gin.ReleaseMode)
 	server := NewServer()
 	server.router.ServeHTTP(w, r)
 }
