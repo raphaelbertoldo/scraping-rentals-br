@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly"
+	"github.com/raphaelbertoldo/scraping-rentals-br/internal/models"
 )
 
 func NewService() *Service {
@@ -13,18 +14,18 @@ func NewService() *Service {
 
 type Service struct{}
 
-type Imovel struct {
-	Url      string   `json:"url"`
-	Title    string   `json:"title"`
-	Type     string   `json:"type"`
-	Subtitle string   `json:"subtitle"`
-	Info     string   `json:"info"`
-	Price    string   `json:"price"`
-	Imgs     []string `json:"imgs"`
-}
+// type Imovel struct {
+// 	Url      string   `json:"url"`
+// 	Title    string   `json:"title"`
+// 	Type     string   `json:"type"`
+// 	Subtitle string   `json:"subtitle"`
+// 	Info     string   `json:"info"`
+// 	Price    string   `json:"price"`
+// 	Imgs     []string `json:"imgs"`
+// }
 
-func (s *Service) Scraper(urls []string) []Imovel {
-	var imoveis []Imovel
+func (s *Service) Scraper(urls []string) []models.Imovel {
+	var imoveis []models.Imovel
 
 	for _, url := range urls {
 		fmt.Println("Processando URL:", url)
@@ -35,7 +36,7 @@ func (s *Service) Scraper(urls []string) []Imovel {
 			fmt.Println("Ocorreu um erro:", e)
 		})
 
-		imovel := Imovel{
+		imovel := models.Imovel{
 			Url: url,
 		}
 

@@ -20,22 +20,22 @@ func NewService() *Service {
 func (s *Service) Scraper(urls []string) []models.Imovel {
 	var imoveis []models.Imovel
 
-	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", false),
-		chromedp.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"),
-	)
-
-	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
-	defer cancel()
-
-	ctx, cancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(log.Printf))
-	defer cancel()
-
-	timeout := 60 * time.Second
-	ctx, cancel = context.WithTimeout(ctx, timeout)
-	defer cancel()
-
 	for _, url := range urls {
+		opts := append(chromedp.DefaultExecAllocatorOptions[:],
+			chromedp.Flag("headless", false),
+			chromedp.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"),
+		)
+
+		allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+		defer cancel()
+
+		ctx, cancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(log.Printf))
+		defer cancel()
+
+		timeout := 60 * time.Second
+		ctx, cancel = context.WithTimeout(ctx, timeout)
+		defer cancel()
+
 		fmt.Println("[VIVA - SCRAPER] Processando URL:", url)
 
 		var title, propertyType, subtitle, info, address, price string

@@ -36,6 +36,21 @@ func (s *Service) Search(neighborhood string, min string, max string) ([]models.
 	var hrefs []string
 
 	err := chromedp.Run(ctx,
+		chromedp.Navigate("https://www.vivareal.com.br/aluguel/minas-gerais/uberlandia/casa_residencial/"),
+		chromedp.Sleep(2*time.Second),
+
+		chromedp.SendKeys("#filter-location-search-input", neighborhood, chromedp.ByID),
+		chromedp.Sleep(3*time.Second),
+
+		chromedp.Click(`.autocomplete__list > li[data-type="neighborhood"]`, chromedp.ByQuery),
+		chromedp.Sleep(2*time.Second),
+
+		chromedp.SendKeys("#filter-range-from-price", min, chromedp.ByID),
+		chromedp.Sleep(2*time.Second),
+
+		chromedp.SendKeys("#filter-range-to-price", max+"\n", chromedp.ByID),
+
+		chromedp.Sleep(6*time.Second),
 
 		chromedp.Evaluate(`
 			(() => {
@@ -45,8 +60,7 @@ func (s *Service) Search(neighborhood string, min string, max string) ([]models.
 						uniqueHrefs.add(el.href);
 					}
 				});
-				return ["https://www.vivareal.com.br/imovel/casa-2-quartos-jardim-inconfidencia-bairros-uberlandia-com-garagem-152m2-aluguel-RS2000-id-2746635894/"
-				]
+				return Array.from(uniqueHrefs)
 			})()
 		`, &hrefs),
 	)

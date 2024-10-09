@@ -218,6 +218,7 @@ func (s *Service) Search(neighborhood string, min string, max string) ([]models.
 			Title:    scrapedImovel.Title,
 			Type:     scrapedImovel.Type,
 			Subtitle: scrapedImovel.Subtitle,
+			Address:  scrapedImovel.Address,
 			Info:     scrapedImovel.Info,
 			Price:    scrapedImovel.Price,
 			Imgs:     scrapedImovel.Imgs,

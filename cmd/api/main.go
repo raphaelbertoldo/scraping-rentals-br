@@ -22,15 +22,14 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "neighborhood query is required"})
 			return
 		}
-
-		results, err := searchService.Search(neighborhood, min, max)
+		results1, err := vivaService.Search(neighborhood, min, max)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao realizar a busca"})
 			return
 		}
-		results1, err := vivaService.Search(neighborhood, min, max)
+		results, err := searchService.Search(neighborhood, min, max)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao realizar a busca"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao realizar a buscar "})
 			return
 		}
 
