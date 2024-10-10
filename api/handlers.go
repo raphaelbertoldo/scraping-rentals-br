@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,14 +10,14 @@ import (
 )
 
 type Server struct {
-	router        *gin.Engine
+	Router        *gin.Engine
 	searchService *ivanService.Service
 	vivaService   *vivaService.Service
 }
 
 func NewServer() *Server {
 	s := &Server{
-		router:        gin.New(),
+		Router:        gin.Default(),
 		searchService: ivanService.NewService(),
 		vivaService:   vivaService.NewService(),
 	}
@@ -25,11 +26,12 @@ func NewServer() *Server {
 }
 
 func (s *Server) setupRoutes() {
-	s.router.GET("/", s.handleSearch)
-	s.router.GET("/health", s.checkHealth)
+	s.Router.GET("/rentals", s.handleSearch)
+	s.Router.GET("/", s.checkHealth)
 }
 
 func (s *Server) handleSearch(c *gin.Context) {
+	fmt.Println("🚀 ~ EXECUTANDO FUNC handleSearch : ")
 	neighborhood := c.Query("neighborhood")
 	min := c.Query("min")
 	max := c.Query("max")
@@ -68,5 +70,5 @@ func (s *Server) checkHealth(c *gin.Context) {
 func Handler(w http.ResponseWriter, r *http.Request) {
 	gin.SetMode(gin.ReleaseMode)
 	server := NewServer()
-	server.router.ServeHTTP(w, r)
+	server.Router.ServeHTTP(w, r)
 }
