@@ -22,8 +22,11 @@ func (s *Service) Scraper(urls []string) []models.Imovel {
 
 	for _, url := range urls {
 		opts := append(chromedp.DefaultExecAllocatorOptions[:],
-			chromedp.Flag("headless", false),
-			chromedp.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"),
+			chromedp.Flag("no-sandbox", true),
+			chromedp.Flag("disable-setuid-sandbox", true),
+			chromedp.Flag("disable-blink-features", "AutomationControlled"),
+			chromedp.Flag("window-size", "1920,1080"),
+			chromedp.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"),
 		)
 
 		allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
@@ -40,11 +43,11 @@ func (s *Service) Scraper(urls []string) []models.Imovel {
 
 		var title, propertyType, subtitle, info, address, price string
 		var imgUrls []string
-
+		var body string
 		err := chromedp.Run(ctx,
 			chromedp.Navigate(url),
-			chromedp.WaitVisible("body", chromedp.ByQuery),
-
+			chromedp.WaitReady("body", chromedp.ByQuery),
+			chromedp.OuterHTML("html", &body, chromedp.ByQuery),
 			chromedp.Text(".price-info-value", &price, chromedp.ByQuery),
 			chromedp.Text(".description__title", &title, chromedp.ByQuery),
 			chromedp.Text(".description__title", &subtitle, chromedp.ByQuery),
@@ -58,6 +61,8 @@ func (s *Service) Scraper(urls []string) []models.Imovel {
 				})
 			`, &imgUrls),
 		)
+
+		// fmt.Println("body ::::", body)
 
 		if err != nil {
 			log.Printf("Erro ao processar %s: %v", url, err)
