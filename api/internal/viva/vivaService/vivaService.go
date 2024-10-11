@@ -2,10 +2,12 @@ package vivaService
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
 
+	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/chromedp"
 	"github.com/raphaelbertoldo/scraping-rentals-br/api/internal/models"
 	"github.com/raphaelbertoldo/scraping-rentals-br/api/internal/viva/scraper"
@@ -20,8 +22,11 @@ type Service struct{}
 func (s *Service) Search(neighborhood string, min string, max string) ([]models.Imovel, error) {
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("enable-automation", false),
-		chromedp.Flag("headless", false),
+		chromedp.Flag("no-sandbox", true),
+		chromedp.Flag("disable-setuid-sandbox", true),
+		chromedp.Flag("disable-blink-features", "AutomationControlled"),
+		chromedp.Flag("window-size", "1920,1080"),
+		chromedp.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"),
 	)
 
 	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
@@ -30,14 +35,35 @@ func (s *Service) Search(neighborhood string, min string, max string) ([]models.
 	ctx, cancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(log.Printf))
 	defer cancel()
 
+	chromedp.ListenTarget(ctx, func(ev interface{}) {
+		switch ev := ev.(type) {
+		case *runtime.EventConsoleAPICalled:
+			var msg string
+
+			for _, arg := range ev.Args {
+				var argValue interface{}
+
+				if err := json.Unmarshal(arg.Value, &argValue); err != nil {
+					msg += string(arg.Value)
+				} else {
+					msg += fmt.Sprintf("%v ", argValue)
+				}
+			}
+
+			fmt.Printf("[Console] %s\n", msg)
+		}
+	})
+
 	ctx, cancel = context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
 
 	var hrefs []string
-
+	var body string
 	err := chromedp.Run(ctx,
+
 		chromedp.Navigate("https://www.vivareal.com.br/aluguel/minas-gerais/uberlandia/casa_residencial/"),
-		chromedp.Sleep(2*time.Second),
+		chromedp.WaitReady("body"),
+		chromedp.OuterHTML("html", &body, chromedp.ByQuery),
 
 		chromedp.SendKeys("#filter-location-search-input", neighborhood, chromedp.ByID),
 		chromedp.Sleep(3*time.Second),
@@ -64,6 +90,7 @@ func (s *Service) Search(neighborhood string, min string, max string) ([]models.
 			})()
 		`, &hrefs),
 	)
+	fmt.Println("body", body)
 
 	if err != nil {
 		log.Fatal(err)
